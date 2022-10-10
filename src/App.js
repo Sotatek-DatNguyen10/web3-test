@@ -45,7 +45,7 @@ function App() {
   const [ethBalance, setEthBalance] = useState(0);
 
   const handleGet = async () => {
-    const tmp = getBalance();
+    const tmp = await getBalance();
     setEthBalance(tmp);
   };
 
@@ -68,7 +68,10 @@ function App() {
         </div>
         <div className="flex flex-col bg-white w-1/2 m-5">
           <h1 className="text-xl  w-full">Balance: 5 ETH</h1>
-          <button type="button" className="bg-gray-400 rounded-full">
+          <button
+            type="button"
+            className="bg-gray-400 rounded-full w-1/2 flex justify-center items-center"
+          >
             Harvest
           </button>
           <button
@@ -76,7 +79,7 @@ function App() {
             className="flex flex-row justify-center items-center w-1/2 my-5 mf-5 bg-gray-500 p-3 rounded-xl cursor-pointer hover:bg-gray-400"
             onClick={connectInjectedConnector}
           >
-            Withdraw
+            Connect Metamask
           </button>
         </div>
       </div>
