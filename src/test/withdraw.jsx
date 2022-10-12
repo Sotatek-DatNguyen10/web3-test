@@ -17,12 +17,12 @@ const PROVIDER = "https://data-seed-prebsc-1-s1.binance.org:8545";
     .estimateGas({
       from: "0x33E0902c65c7f3fe4b33407ec7172f0842fd2d65",
     });
-  console.log(estimateGas);
+
   await ABCContract.methods
     .withdraw("99990000000")
     .send({
       from: "0x33E0902c65c7f3fe4b33407ec7172f0842fd2d65",
-      gas: estimateGas * 1.3,
+      gas: estimateGas,
     })
     .then((value) => {
       console.log(value);
