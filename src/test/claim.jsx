@@ -24,6 +24,7 @@ const claim = async () => {
     })
     .then((value) => {
       if (value != null) return true;
+      else return false;
     });
 };
 

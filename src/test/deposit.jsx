@@ -2,7 +2,7 @@ const Web3 = require("web3");
 const CONTRACT_ABI = require("../ContractABI.json");
 const PROVIDER = "https://data-seed-prebsc-1-s1.binance.org:8545";
 
-(async () => {
+const deposit = async (account, amount) => {
   const web3 = new Web3(PROVIDER);
   const ABCContract = new web3.eth.Contract(
     CONTRACT_ABI,
@@ -12,19 +12,28 @@ const PROVIDER = "https://data-seed-prebsc-1-s1.binance.org:8545";
     "2a9e33616f6220453ee81c8228e45ef5c06f6278997bc9a1ee4e3b4c93087b97" // wallet private key
   );
 
-  const estimateGas = await ABCContract.methods
-    .deposit("99990000000")
-    .estimateGas({
-      from: "0x33E0902c65c7f3fe4b33407ec7172f0842fd2d65",
-    });
+  const estimateGas = await ABCContract.methods.deposit(amount).estimateGas({
+    from: account,
+  });
 
-  await ABCContract.methods
-    .deposit("99990000000")
-    .send({
-      from: "0x33E0902c65c7f3fe4b33407ec7172f0842fd2d65",
-      gas: estimateGas * 1.1,
-    })
-    .then((value) => {
-      console.log(value);
-    });
-})();
+  const rs = await ABCContract.methods.deposit(amount).send({
+    from: account,
+    gas: estimateGas * 2,
+  });
+  // .then((value) => {
+  //   if (value != null) return true;
+  //   else return false;
+  // });
+  return rs.blockNumber;
+};
+
+// (async () => {
+//   console.log(
+//     await deposit(
+//       "0x33E0902c65c7f3fe4b33407ec7172f0842fd2d65",
+//       "49983520354686"
+//     )
+//   );
+// })();
+
+export default deposit;
