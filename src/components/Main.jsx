@@ -52,11 +52,12 @@ function Main(props) {
             Wallet addr: {props.account}
           </h1>
           <h1 className="truncate text-xl w-full">Total Stake: {deposited}</h1>
-          {allowance >= balance * 0.9 && (
+          {allowance < balance * 0.9 && (
             <button
               type="button"
               className="flex justify-center items-center w-1/2 my-5 mf-5 bg-gray-500 p-3 rounded-xl cursor-pointer hover:bg-gray-400"
               onClick={() => {
+                setCount(count + 1);
                 setPopUpApproveCondition(!popUpApproveCondition);
                 setPopUpWithdrawCondition(false);
                 setPopUpStakeCondition(false);
