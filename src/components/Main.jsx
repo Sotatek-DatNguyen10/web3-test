@@ -1,13 +1,16 @@
 import React from "react";
-import ApproveButton from "./ApproveButton";
 import { useEffect, useState } from "react";
 import getBalance from "../test/getBalance.js";
 import getPendingReward from "../test/getPendingReward";
 import getAllowance from "../test/getAllowance";
 import claim from "../test/claim";
+import approve from "../test/approve";
 import getUserInfo from "../test/getUserInfo";
 import PopUpStake from "./PopUpStake";
 import PopUpWithdraw from "./PopUpWithdraw";
+import PopUpApprove from "./PopUpApprove";
+
+const spender = "0xF0c54801E775D83196b50067103D136682d37e3f";
 
 const companyCommonStyles =
   "min-h-[70px] sm:px-0 px-2 sm:min-w-[120px] flex justify-center items-center border-[0.5px] border-gray-400 text-sm font-light text-black";
@@ -20,10 +23,16 @@ function Main(props) {
   const [condition, setCondition] = useState(false);
   const [popUpStakeCondition, setPopUpStakeCondition] = useState(false);
   const [popUpWithdrawCondition, setPopUpWithdrawCondition] = useState(false);
+  const [popUpApproveCondition, setPopUpApproveCondition] = useState(false);
   const [deposited, setDeposited] = useState(0);
+  const [amount, setAmount] = useState(0);
 
   const handleClaim = async () => {
     await setCondition(await claim());
+  };
+
+  const handleApprove = async () => {
+    await approve(props.account, spender, amount);
   };
 
   useEffect(() => {
@@ -43,6 +52,19 @@ function Main(props) {
             Wallet addr: {props.account}
           </h1>
           <h1 className="truncate text-xl w-full">Total Stake: {deposited}</h1>
+          {allowance >= balance * 0.9 && (
+            <button
+              type="button"
+              className="flex justify-center items-center w-1/2 my-5 mf-5 bg-gray-500 p-3 rounded-xl cursor-pointer hover:bg-gray-400"
+              onClick={() => {
+                setPopUpApproveCondition(!popUpApproveCondition);
+                setPopUpWithdrawCondition(false);
+                setPopUpStakeCondition(false);
+              }}
+            >
+              Approve
+            </button>
+          )}
         </div>
         <div className="flex flex-col bg-white w-1/3 -ml-15 m-5">
           {/* <h1 className="text-xl full">Pending reward</h1> */}
@@ -93,7 +115,6 @@ function Main(props) {
       </div>
       <div className="flex items-center justify-center flex-col border-solid border-3 w-1/2 h-full bg-white ">
         <p1>History of Account</p1>
-        {allowance < balance * 0.9 && <ApproveButton />}
         <div className="grid sm:grid-cols-3 grid-cols-2 w-full mt-10">
           <div className={`rounded-tl-2xl ${companyCommonStyles}`}>
             Reliability
@@ -113,6 +134,9 @@ function Main(props) {
       </div>
       {popUpStakeCondition && <PopUpStake balance={balance} />}
       {popUpWithdrawCondition && <PopUpWithdraw deposited={deposited} />}
+      {popUpApproveCondition && (
+        <PopUpApprove spender={spender} balance={balance} />
+      )}
     </div>
   );
 }
