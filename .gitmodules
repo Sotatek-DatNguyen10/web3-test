@@ -1,0 +1,3 @@
+[submodule "TheGraph/TheGraph/BSCTestNet2.0"]
+	path = TheGraph/TheGraph/BSCTestNet2.0
+	url = https://github.com/Sotatek-DatNguyen10/web3-test.git
