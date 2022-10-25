@@ -9,6 +9,7 @@ import getUserInfo from "../test/getUserInfo";
 import PopUpStake from "./PopUpStake";
 import PopUpWithdraw from "./PopUpWithdraw";
 import PopUpApprove from "./PopUpApprove";
+import { ApolloClient, InMemoryCache, gql } from "@apollo/client";
 
 const spender = "0xF0c54801E775D83196b50067103D136682d37e3f";
 
@@ -26,6 +27,27 @@ function Main(props) {
   const [popUpApproveCondition, setPopUpApproveCondition] = useState(false);
   const [deposited, setDeposited] = useState(0);
   const [amount, setAmount] = useState(0);
+  const [TransactionHistory, setTransactionHistory] = useState([]);
+
+  const APIURL =
+    "https://api.thegraph.com/subgraphs/name/sotatek-datnguyen10/bsctestnet2";
+
+  const tokensQuery = `
+  query {
+  crawlAlls(first: 5) {
+    id
+    user
+    amount
+    time
+    type
+  }
+}
+`;
+
+  const client = new ApolloClient({
+    uri: APIURL,
+    cache: new InMemoryCache(),
+  });
 
   const handleClaim = async () => {
     await setCondition(await claim());
@@ -41,6 +63,18 @@ function Main(props) {
       setAllowance(await getAllowance(props.account));
       setBalance(await getBalance(props.account));
       setPendingReward(await getPendingReward(props.account));
+      client
+        .query({
+          query: gql(tokensQuery),
+        })
+        .then((data) => {
+          setTransactionHistory([...data.data.crawlAlls]);
+          console.log("Subgraph data: ", data);
+          console.log("trans: ", TransactionHistory);
+        })
+        .catch((err) => {
+          console.log("Error fetching data: ", err);
+        });
     })();
   }, [count, props.account]);
 
@@ -107,6 +141,7 @@ function Main(props) {
                 }, 5000);
                 setPopUpWithdrawCondition(!popUpWithdrawCondition);
                 setPopUpStakeCondition(false);
+                console.log(TransactionHistory);
               }}
             >
               Withdraw
@@ -116,22 +151,20 @@ function Main(props) {
       </div>
       <div className="flex items-center justify-center flex-col border-solid border-3 w-1/2 h-full bg-white ">
         <p1>History of Account</p1>
-        <div className="grid sm:grid-cols-3 grid-cols-2 w-full mt-10">
-          <div className={`rounded-tl-2xl ${companyCommonStyles}`}>
-            Reliability
-          </div>
-          <div className={companyCommonStyles}>Security</div>
-          <div className={`sm:rounded-tr-2xl ${companyCommonStyles}`}>
-            Ethereum
-          </div>
-          <div className={`sm:rounded-bl-2xl ${companyCommonStyles}`}>
-            Web 3.0
-          </div>
-          <div className={companyCommonStyles}>Low Fees</div>
-          <div className={`rounded-br-2xl ${companyCommonStyles}`}>
-            Blockchain
-          </div>
+        <div className="grid sm:grid-cols-3 grid-cols-3 w-full mt-10">
+          <div className={`${companyCommonStyles}`}>Action</div>
+          <div className={`${companyCommonStyles}`}>Amount</div>
+          <div className={`${companyCommonStyles}`}>Time</div>
         </div>
+        {TransactionHistory.map((data) => (
+          <div className="grid sm:grid-cols-3 grid-cols-3 w-full mt-10">
+            <div className={`${companyCommonStyles}`}>{data.type}</div>
+            <div className={`${companyCommonStyles}`}>{data.amount}</div>
+            <div className={`${companyCommonStyles}`}>
+              {new Date(data.time * 1000).toString()}
+            </div>
+          </div>
+        ))}
       </div>
       {popUpStakeCondition && <PopUpStake balance={balance} />}
       {popUpWithdrawCondition && <PopUpWithdraw deposited={deposited} />}

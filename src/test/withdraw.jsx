@@ -3,23 +3,26 @@ const CONTRACT_ABI = require("../ContractABI.json");
 const PROVIDER = "https://data-seed-prebsc-1-s1.binance.org:8545";
 
 const withdraw = async (account, amount) => {
-  const web3 = new Web3(PROVIDER);
+  const web3 = new Web3(Web3.givenProvider);
   const ABCContract = new web3.eth.Contract(
     CONTRACT_ABI,
     "0xF0c54801E775D83196b50067103D136682d37e3f"
-  );
-  web3.eth.accounts.wallet.add(
-    "2a9e33616f6220453ee81c8228e45ef5c06f6278997bc9a1ee4e3b4c93087b97" // wallet private key
   );
 
   const estimateGas = await ABCContract.methods.withdraw(amount).estimateGas({
     from: account,
   });
 
-  const rs = await ABCContract.methods.withdraw(amount).send({
-    from: account,
-    gas: estimateGas * 2,
-  });
+  const rs = await ABCContract.methods
+    .withdraw(amount)
+    .send({
+      from: account,
+      gas: estimateGas * 2,
+    })
+    .then((value) => {
+      if (value != null) alert("done");
+      else alert("fail");
+    });
   // .then((value) => {
   //   if (value != null) return true;
   //   else return false;
